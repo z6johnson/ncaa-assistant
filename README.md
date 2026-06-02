@@ -10,7 +10,7 @@ Division I Manual using build-time retrieval (RAG): the manual is parsed into
 per-bylaw chunks, embedded, and committed as an in-memory index. At query time it
 retrieves the relevant bylaws and the model answers only from that closed set, so
 it never invents rules or cites. Models run on the TritonAI hub
-(`gpt-oss-120b` primary, `api-tgpt-embeddings`).
+(`api-gpt-oss-120b` primary, `api-tgpt-embeddings`).
 
 ## Setup
 

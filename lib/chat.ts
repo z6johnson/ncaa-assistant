@@ -1,6 +1,6 @@
 // Chat client for the TritonAI model hub (LiteLLM OpenAI-compatible proxy).
 //
-// Model: CHAT_MODEL_PRIMARY (default gpt-oss-120b), fallback CHAT_MODEL_FALLBACK.
+// Model: CHAT_MODEL_PRIMARY (default api-gpt-oss-120b), fallback CHAT_MODEL_FALLBACK.
 // Purpose: turn retrieved verbatim bylaws into a grounded plain-English answer.
 // Failure mode: timeout / rate limit / malformed output. Fallback: the API route
 // degrades to retrieval-only (top bylaws + verbatim text). Never fabricates.
@@ -15,8 +15,8 @@ export interface ChatResult {
   model: string;
 }
 
-const PRIMARY = () => process.env.CHAT_MODEL_PRIMARY ?? "gpt-oss-120b";
-const FALLBACK = () => process.env.CHAT_MODEL_FALLBACK ?? "gpt-5.5";
+const PRIMARY = () => process.env.CHAT_MODEL_PRIMARY ?? "api-gpt-oss-120b";
+const FALLBACK = () => process.env.CHAT_MODEL_FALLBACK ?? "api-deepseek-v4-flash";
 
 async function callOnce(model: string, messages: ChatMessage[]): Promise<ChatResult> {
   const baseUrl = requireEnv("TRITONAI_BASE_URL").replace(/\/$/, "");

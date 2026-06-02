@@ -8,7 +8,7 @@ export const runtime = "nodejs";
 
 export async function GET() {
   const index = await tryLoadIndex();
-  const model = process.env.CHAT_MODEL_PRIMARY ?? "gpt-oss-120b";
+  const model = process.env.CHAT_MODEL_PRIMARY ?? "api-gpt-oss-120b";
   if (!index) {
     return NextResponse.json(
       { seeded: false, model, manualVersion: null },
