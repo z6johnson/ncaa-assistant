@@ -1,0 +1,15 @@
+# Named human owner for AI-touching code (Responsible AI principle 8:
+# Accountability). Replace with the actual maintainer's GitHub handle.
+# "The team" is not an owner.
+
+*                       @z6johnson
+
+# AI-critical paths get explicit ownership.
+/app/api/               @z6johnson
+/lib/chat.ts            @z6johnson
+/lib/prompt.ts          @z6johnson
+/lib/retrieval.ts       @z6johnson
+/scripts/seed/          @z6johnson
+/data/                  @z6johnson
+/evals/                 @z6johnson
+/docs/prompt-templates/ @z6johnson

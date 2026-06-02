@@ -1,0 +1,7 @@
+{"question": "Is a head coach responsible for a violation by an assistant who reports to them?", "expectedBylaws": ["11.1.1.1"], "expectedCoverage": "covered", "note": "head coach responsibility"}
+{"question": "What does Bylaw 11.1.1.1 say?", "expectedBylaws": ["11.1.1.1"], "expectedCoverage": "covered", "note": "exact-cite lookup"}
+{"question": "Can our athletics staff bet on professional sports?", "expectedBylaws": ["10.3"], "expectedCoverage": "covered", "note": "sports wagering"}
+{"question": "Can a booster help pay one of our coaches' salaries?", "expectedBylaws": ["11.2.2"], "expectedCoverage": "covered", "note": "athletically related income / booster"}
+{"question": "What are the rules on employing someone who still coaches at a local high school?", "expectedBylaws": ["11.4.2"], "expectedCoverage": "covered", "note": "high school coach employment"}
+{"question": "Can a representative of athletics interests give a recruit benefits?", "expectedBylaws": ["13.2.1"], "expectedCoverage": "covered", "note": "offers and inducements"}
+{"question": "What is the maximum number of hours a team can practice during a bye week in football?", "expectedBylaws": [], "expectedCoverage": "uncovered", "note": "trap: not in fixture corpus, must refuse"}

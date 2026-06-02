@@ -1,0 +1,25 @@
+name: Manual freshness check
+
+# Detects when the NCAA publishes a newer Division I Manual. It does NOT rewrite
+# legal text automatically: on a new manual it fails loudly so a maintainer runs
+# `npm run seed` and reviews the data/index.meta.json diff in a PR.
+
+on:
+  schedule:
+    - cron: "0 13 * * 1" # weekly, Monday 13:00 UTC
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - name: Check for a newer manual
+        env:
+          MANUAL_SOURCE_URL: ${{ secrets.MANUAL_SOURCE_URL }}
+        run: npm run seed:check-freshness

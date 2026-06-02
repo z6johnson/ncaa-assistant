@@ -1,0 +1,123 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+  Design tokens — single source of truth for color, type, spacing, motion.
+  Per the seed style guide (Required Project Artifacts). Components reference
+  these by name via Tailwind; no raw hex or px in components.
+
+  Accessibility: grayscale carries hierarchy; one muted accent carries meaning
+  and is always paired with text/weight/position. All pairings meet WCAG 2.1 AA.
+*/
+:root {
+  /* Type families. Sans for command/organization, serif for reading prose. */
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-serif: ui-serif, Georgia, Cambria, "Times New Roman", serif;
+  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+
+  /* Type scale — at most five sizes in active use. Relative units honor user prefs. */
+  --font-size-meta: 0.75rem;
+  --font-size-body: 1rem;
+  --font-size-lead: 1.125rem;
+  --font-size-title: 1.5rem;
+  --font-size-display: 2rem;
+
+  /* Achromatic spectrum, light theme (gray-0 = page, gray-12 = strongest ink). */
+  --gray-0: #ffffff;
+  --gray-1: #f7f7f8;
+  --gray-2: #eeeef0;
+  --gray-3: #e3e3e6;
+  --gray-4: #d3d3d8;
+  --gray-5: #b9b9c0;
+  --gray-6: #9a9aa3;
+  --gray-7: #7c7c86;
+  --gray-8: #5f5f69;
+  --gray-9: #46464e;
+  --gray-10: #303036;
+  --gray-11: #1d1d21;
+  --gray-12: #0c0c0e;
+
+  /* Semantic accent + status. Muted; always paired with a non-color signal. */
+  --accent: #00629b;            /* UC San Diego deep blue, used only for meaning */
+  --accent-weak: #e6f0f6;
+  --status-caution: #8a5a00;    /* uncovered / verify — paired with a text label */
+  --status-success: #1f6b3a;
+
+  /* Spacing — 4px base unit. No magic numbers in components. */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+
+  --radius-sm: 2px;
+  --measure: 42rem;             /* comfortable reading measure */
+
+  /* Motion — confirm, do not perform. */
+  --motion-confirm: 160ms;
+  --motion-layout: 240ms;
+  --focus-ring: 2px solid var(--accent);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --gray-0: #0c0c0e;
+    --gray-1: #131316;
+    --gray-2: #1b1b1f;
+    --gray-3: #242429;
+    --gray-4: #303036;
+    --gray-5: #45454d;
+    --gray-6: #5f5f69;
+    --gray-7: #818189;
+    --gray-8: #9d9da5;
+    --gray-9: #bcbcc2;
+    --gray-10: #d6d6da;
+    --gray-11: #ececee;
+    --gray-12: #fafafb;
+    --accent: #5cb3e6;
+    --accent-weak: #10222e;
+    --status-caution: #e0a64d;
+    --status-success: #5fcf86;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  color-scheme: light dark;
+}
+
+body {
+  margin: 0;
+  background: var(--gray-0);
+  color: var(--gray-12);
+  font-family: var(--font-sans);
+  font-size: var(--font-size-body);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Visible, high-contrast focus on every interactive element. */
+:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: 2px;
+}
+
+/* Honor reduced-motion: disable non-essential transitions. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
