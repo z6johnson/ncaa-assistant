@@ -1,0 +1,72 @@
+name: Manual seed (real data)
+
+# Manually triggered re-seed of the committed index from the REAL Division I
+# Manual. Runs `npm run seed` with the hub credentials and opens a PR with the
+# data/ diff for human review — it NEVER pushes new legal text to main directly.
+#
+# Pair with manual-freshness.yml, which only DETECTS a newer manual. This is the
+# UI equivalent of running `npm run seed` locally, so you don't need a CLI seed.
+#
+# Requires these repository secrets (Settings -> Secrets and variables -> Actions):
+#   MANUAL_SOURCE_URL  the Division I Manual report/PDF URL (already used by freshness)
+#   TRITONAI_BASE_URL  embeddings hub base URL (LiteLLM OpenAI-compatible proxy)
+#   TRITONAI_API_KEY   embeddings hub API key
+
+on:
+  workflow_dispatch:
+    inputs:
+      reason:
+        description: "Why are you re-seeding? (shown in the PR body)"
+        required: false
+        default: "Manual re-seed triggered from the GitHub Actions UI"
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  seed:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - name: Seed the index from the real manual
+        env:
+          MANUAL_SOURCE_URL: ${{ secrets.MANUAL_SOURCE_URL }}
+          TRITONAI_BASE_URL: ${{ secrets.TRITONAI_BASE_URL }}
+          TRITONAI_API_KEY: ${{ secrets.TRITONAI_API_KEY }}
+        run: npm run seed
+      - name: Open a re-seed PR for review
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REASON: ${{ github.event.inputs.reason }}
+        run: |
+          set -euo pipefail
+          if git diff --quiet -- data; then
+            echo "::notice::No data changes — the index already matches the current manual. Nothing to PR."
+            exit 0
+          fi
+          branch="seed/reseed-$(date -u +%Y%m%d-%H%M%S)"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$branch"
+          git add data/index.meta.json data/index.vectors.bin data/manifest.json
+          git commit -m "chore(data): re-seed Division I Manual index"
+          git push -u origin "$branch"
+          gh pr create \
+            --base main \
+            --head "$branch" \
+            --title "Re-seed Division I Manual index" \
+            --body "Automated re-seed triggered from the GitHub Actions UI.
+
+          **Reason:** ${REASON}
+
+          Review the \`data/index.meta.json\` and \`data/manifest.json\` diff before
+          merging — this changes the verbatim legal text the assistant cites. Confirm
+          \`contentSha256\`, \`academicYear\`, and \`chunkCount\` in the manifest look
+          right. \`data/index.vectors.bin\` is a binary embedding matrix and won't
+          render as a readable diff."
