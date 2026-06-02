@@ -43,7 +43,36 @@ export function normalizeVerbatim(raw: string): string {
     .trim();
 }
 
+// A Table-of-Contents / list-of-figures entry: a bylaw (or figure) number, a
+// Title Case heading ending in a period, then a page number. The body has no
+// such "Title. <page#>" lines, so this matches front matter but not real rules.
+const TOC_ENTRY_RE = /\d{1,2}(?:[.\-]\d{1,3})*\s+[A-Z][^.\n]{1,90}?\.\s+\d{1,4}(?=\s)/g;
+
+/** Drop the front-matter Table of Contents before parsing.
+ *
+ *  The TOC lists every bylaw number + title + page number. Those lines look
+ *  enough like headings that HEADING_RE matches the ones that land at the top of
+ *  a page (the page-break newline satisfies its anchor) — e.g. a TOC
+ *  "13.17 Recruiting Calendars. 124" collides with the real "13.17", tripping the
+ *  duplicate-number QA gate, and the others leak in as garbage chunks. The TOC is
+ *  a dense, contiguous block of TOC_ENTRY_RE lines at the very start; the body
+ *  has none. Find the end of that initial cluster and resume there. A document
+ *  with no real TOC (e.g. the synthetic fixture) is returned untouched. */
+export function stripFrontMatter(text: string): string {
+  const ends: number[] = [];
+  for (const m of text.matchAll(TOC_ENTRY_RE)) ends.push((m.index ?? 0) + m[0].length);
+  if (ends.length < 10) return text; // not a real TOC
+  let end = ends[0];
+  for (let i = 1; i < ends.length; i++) {
+    if (ends[i] - end > 5000) break; // first large gap = TOC -> body boundary
+    end = ends[i];
+  }
+  const nl = text.indexOf("\n", end);
+  return text.slice(nl > 0 ? nl + 1 : end);
+}
+
 export function parseManualText(text: string): ParsedSection[] {
+  text = stripFrontMatter(text);
   const sections: ParsedSection[] = [];
   const matches = [...text.matchAll(HEADING_RE)];
   for (let i = 0; i < matches.length; i++) {
