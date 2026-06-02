@@ -16,9 +16,11 @@ export interface ParsedSection {
 
 // A bylaw heading: dotted-decimal number, then a Title Case heading ending in a
 // period, e.g. "11.1.1.1 Responsibility of Head Coach." The remainder up to the
-// next heading is the verbatim body.
+// next heading is the verbatim body. The number must have at least one dotted
+// component: bare integers at the start of a line are footnote markers or list
+// items ("2 See Bylaw 17.12.6.1."), never body bylaw numbers.
 const HEADING_RE =
-  /(?:^|\n)\s*(\d{1,2}(?:\.\d{1,3}){0,5})\s+([A-Z][^.\n]{2,120}?\.)\s/g;
+  /(?:^|\n)\s*(\d{1,2}(?:\.\d{1,3}){1,5})\s+([A-Z][^.\n]{2,120}?\.)\s/g;
 
 export function parentPathOf(bylawNumber: string): string[] {
   const parts = bylawNumber.split(".");
@@ -112,11 +114,18 @@ export function qaCheck(sections: ParsedSection[], rawLength: number): QaReport 
     );
   }
 
-  // Duplicate bylaw numbers indicate a parsing error.
+  // A repeated bylaw number is normally a parsing error, but the manual genuinely
+  // reuses some numbers for parallel provisions (e.g. men's vs women's sports in
+  // Article 17). Those carry distinct verbatim text and distinct text-hashed
+  // chunk IDs, so they coexist fine. Only flag an EXACT repeat -- same number AND
+  // identical text -- which is real double-extraction of one bylaw.
   const seen = new Set<string>();
   for (const s of sections) {
-    if (seen.has(s.bylawNumber)) problems.push(`duplicate bylaw number: ${s.bylawNumber}`);
-    seen.add(s.bylawNumber);
+    const key = `${s.bylawNumber} ${s.verbatimText}`;
+    if (seen.has(key)) {
+      problems.push(`duplicate bylaw section: ${s.bylawNumber} (identical text repeated)`);
+    }
+    seen.add(key);
   }
 
   return { ok: problems.length === 0, sectionCount: sections.length, problems };

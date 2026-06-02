@@ -33,10 +33,23 @@ async function extractPdfText(bytes: Uint8Array): Promise<string> {
   for (let p = 1; p <= doc.numPages; p++) {
     const page = await doc.getPage(p);
     const content = await page.getTextContent();
-    const line = content.items
-      .map((it) => ("str" in it ? it.str : ""))
-      .join(" ");
-    pages.push(line);
+    // Reconstruct visual lines using pdfjs's end-of-line flag. The manual uses
+    // run-in headings (the bold bylaw number + title begins the line, body text
+    // continues on it), so a per-line layout puts every heading at the start of a
+    // line where parseManualText's anchored regex can find it. Flattening the
+    // whole page to one string (the old behaviour) hid all but the first heading
+    // per page behind the lack of a line break.
+    const lines: string[] = [];
+    let line: string[] = [];
+    for (const it of content.items) {
+      if ("str" in it) line.push(it.str);
+      if ("hasEOL" in it && it.hasEOL) {
+        lines.push(line.join(" "));
+        line = [];
+      }
+    }
+    if (line.length) lines.push(line.join(" "));
+    pages.push(lines.join("\n"));
   }
   return pages.join("\n");
 }

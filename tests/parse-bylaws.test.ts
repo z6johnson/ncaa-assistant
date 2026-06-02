@@ -28,6 +28,36 @@ test("parseManualText extracts bylaw sections from the fixture", () => {
   assert.ok(head.verbatimText.includes("presumed to be responsible"));
 });
 
+test("parseManualText ignores bare-number footnotes and list items", () => {
+  // The PDF prints footnote markers and enumerated items as a bare integer at
+  // the start of a line ("2 See Bylaw ..."); only dotted numbers are bylaws.
+  const text =
+    "\n13.2.1 General Rule. An institution shall not provide impermissible benefits.\n" +
+    "2 See Bylaw 17.12.6.1 for the applicable limit on contests.\n" +
+    "13.2.2 Exception. A representative may not provide compensation to a coach.";
+  const numbers = parseManualText(text).map((s) => s.bylawNumber);
+  assert.deepEqual(numbers, ["13.2.1", "13.2.2"]);
+});
+
+test("qaCheck allows a reused number with different text but flags identical repeats", () => {
+  const mk = (bylawNumber: string, verbatimText: string) => ({
+    bylawNumber,
+    parentPath: [],
+    title: "Length of Playing Season",
+    verbatimText,
+  });
+  // Genuine parallel provisions (e.g. men's vs women's Article 17): same number,
+  // different text -> legitimate, must pass.
+  const parallel = [mk("17.22.1", "Men's soccer season is 132 days."), mk("17.22.1", "Women's soccer season is 144 days.")];
+  const totalLen = parallel.reduce((n, s) => n + s.verbatimText.length, 0);
+  assert.equal(qaCheck(parallel, totalLen).ok, true);
+  // Real double-extraction: same number AND identical text -> flagged.
+  const repeated = [mk("17.22.1", "Identical text."), mk("17.22.1", "Identical text.")];
+  const qa = qaCheck(repeated, repeated[0].verbatimText.length * 2);
+  assert.equal(qa.ok, false);
+  assert.ok(qa.problems.some((p) => p.includes("duplicate")));
+});
+
 test("stripFrontMatter removes a table of contents so it can't shadow real bylaws", () => {
   // A TOC entry that lands at the top of a page (preceded by a newline) matches
   // the heading regex and collides with the real bylaw of the same number. Real
