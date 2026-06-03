@@ -1,12 +1,12 @@
 {
-  "sourceUrl": "fixture:synthetic-manual",
-  "retrievedAt": "2026-06-02T18:50:08.786Z",
-  "contentSha256": "52a30bf799baf8632b38be391bae7d91982f4cffc397ea778f54b2935f4a38f2",
-  "manualTitle": "SYNTHETIC FIXTURE",
-  "academicYear": "FIXTURE (synthetic, not real NCAA rules)",
-  "embedModel": "mock-local-hash",
-  "embedDim": 256,
-  "chunkCount": 6,
-  "buildCommit": "c62cc9c",
-  "mockEmbeddings": true
+  "sourceUrl": "https://web3.ncaa.org/lsdbi/reports/getReport/90008",
+  "retrievedAt": "2026-06-02T21:06:14.862Z",
+  "contentSha256": "6559fb8aea13ee0284f9a44e21cbcf6a2f1714ef26fd75ab5d919a9c6820117c",
+  "manualTitle": "Division I Manual",
+  "academicYear": "2025-26",
+  "embedModel": "api-tgpt-embeddings",
+  "embedDim": 1024,
+  "chunkCount": 3256,
+  "buildCommit": "29b2588",
+  "mockEmbeddings": false
 }
